@@ -4,10 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct si1145_t
+typedef struct
 {
     uint8_t i2c_addr;
-};
+} si1145_t;
 
 bool si1145_begin(si1145_t *dev);
 void si1145_reset(si1145_t *dev);
