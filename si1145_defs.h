@@ -132,4 +132,6 @@
 #define SI1145_PARAM_ALS_IR_ADC_MISC            0x1F
 #define SI1145_PARAM_ALS_IR_ADC_MISC_IR_RANGE   0x20
 
+#define SI1145_ADDR 0x60
+
 #endif
