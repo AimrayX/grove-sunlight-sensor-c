@@ -4,9 +4,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct
-{
+typedef struct {
+
     uint8_t i2c_addr;
+    int i2c_fd;
+    bool initialized;
+    uint8_t last_error;
+    
 } si1145_t;
 
 bool si1145_begin(si1145_t *dev);
