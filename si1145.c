@@ -8,6 +8,7 @@ bool si1145_begin(si1145_t *dev) {
     dev->i2c_fd = wiringPiI2CSetup(SI1145_ADDR);
     dev->part_ID = si1145_read_from_register(dev, SI1145_REG_PART_ID);
     si1145_write_to_register(dev, SI1145_REG_HW_KEY, 0x17);
+    
 }
 
 
@@ -29,12 +30,34 @@ void si1145_default_init(si1145_t *dev) {
                                | SI1145_PARAM_CHLIST_ENALSVIS
                                | SI1145_PARAM_CHLIST_ENPS1);
     
+    //set LED1 current
+    //not sure if really needed
     si1145_write_param_data(dev, SI1145_PARAM_PS1_ADCMUX, SI1145_ADCMUX_LARGE_IR);
     si1145_write_to_register(dev, SI1145_REG_PS_LED21, SI1145_SET_LED_CURRENT_22MA);
+    si1145_write_param_data(dev, SI1145_PARAM_PSLED12_SELECT, SI1145_PSLED12_SELECT_PS1_LED1);
     
+    //adc settings
     si1145_write_param_data(dev, SI1145_PARAM_PS_ADC_GAIN, SI1145_SET_ADC_GAIN_DIV1);
     si1145_write_param_data(dev, SI1145_PARAM_PS_ADC_COUNTER, SI1145_SET_ADC_COUNTER_511ADCCLK);
     si1145_write_param_data(dev, SI1145_PARAM_PS_ADC_MISC, SI1145_SET_ADC_MISC_HIGHRANGE);
+
+    //vis settings
+    si1145_write_param_data(dev, SI1145_PARAM_ALS_VIS_ADC_GAIN, SI1145_SET_ADC_GAIN_DIV1);
+    si1145_write_param_data(dev, SI1145_PARAM_ALS_VIS_ADC_COUNTER, SI1145_SET_ADC_COUNTER_511ADCCLK);
+    si1145_write_param_data(dev, SI1145_PARAM_ALS_VIS_ADC_MISC, SI1145_SET_ADC_MISC_HIGHRANGE);
+
+    //ir settings
+    si1145_write_param_data(dev, SI1145_PARAM_ALS_IR_ADC_GAIN, SI1145_SET_ADC_GAIN_DIV1);
+    si1145_write_param_data(dev, SI1145_PARAM_ALS_IR_ADC_COUNTER, SI1145_SET_ADC_COUNTER_511ADCCLK);
+    si1145_write_param_data(dev, SI1145_PARAM_ALS_IR_ADC_MISC, SI1145_SET_ADC_MISC_HIGHRANGE);
+
+    //enable interrupt
+    si1145_write_to_register(dev, SI1145_REG_INT_CFG, 0x01);
+    si1145_write_to_register(dev, SI1145_REG_IRQ_ENABLE, SI1145_SET_IRQ_ENABLE_ALS_IE);
+
+    //auto run
+    si1145_write_to_register(dev, SI1145_REG_MEAS_RATE0, 0xFF);
+    si1145_exec_command(dev, SI1145_CMD_PSALS_AUTO);
 }
 
 
