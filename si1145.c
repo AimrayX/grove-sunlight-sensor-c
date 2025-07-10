@@ -8,7 +8,7 @@ bool si1145_begin(si1145_t *dev) {
     dev->i2c_fd = wiringPiI2CSetup(SI1145_ADDR);
     dev->part_ID = si1145_read_from_register(dev, SI1145_REG_PART_ID);
     si1145_write_to_register(dev, SI1145_REG_HW_KEY, 0x17);
-    
+    si1145_default_init(dev);
 }
 
 
@@ -161,6 +161,7 @@ int si1145_ps_als_force(si1145_t *dev) {
 
 uint8_t si1145_read_param_data(si1145_t *dev, uint8_t param) {
     si1145_exec_command(dev, SI1145_CMD_PARAM_QUERY | param);
+    
     return si1145_read_from_register(dev, SI1145_REG_PARAM_RD);
 }
 
@@ -169,33 +170,50 @@ uint8_t si1145_read_param_data(si1145_t *dev, uint8_t param) {
 uint8_t si1145_write_param_data(si1145_t *dev, uint8_t param, uint8_t value) {
     si1145_write_to_register(dev, SI1145_REG_PARAM_WR, value);
     si1145_exec_command(dev, SI1145_CMD_PARAM_SET | param);
+    
     return si1145_read_from_register(dev, SI1145_REG_PARAM_RD);
 }
 
 
 
 uint16_t si1145_read_visible(si1145_t *dev) {
-
-
+    uint8_t low = si1145_read_from_register(dev, SI1145_REG_ALS_VIS_DATA0);
+    uint8_t high = si1145_read_from_register(dev, SI1145_REG_ALS_VIS_DATA1);
+    uint16_t rslt = ((uint16_t)high << 8) | low;
+    dev->IR = rslt;
+    
+    return rslt;
 }
 
 
 
 uint16_t si1145_read_IR(si1145_t *dev) {
-
-
+    uint8_t low = si1145_read_from_register(dev, SI1145_REG_ALS_IR_DATA0);
+    uint8_t high = si1145_read_from_register(dev, SI1145_REG_ALS_IR_DATA1);
+    uint16_t rslt = ((uint16_t)high << 8) | low;
+    dev->IR = rslt;
+    
+    return rslt;
 }
 
 
 
 uint16_t si1145_read_proximity(si1145_t *dev, int PSn) {
-
-
+    uint8_t low = si1145_read_from_register(dev, SI1145_REG_PS1_DATA0);
+    uint8_t high = si1145_read_from_register(dev, SI1145_REG_PS1_DATA1);
+    uint16_t rslt = ((uint16_t)high << 8) | low;
+    dev->IR = rslt;
+    
+    return rslt;
 }
 
 
 
 uint16_t si1145_read_UV(si1145_t *dev) {
-
-
+    uint8_t low = si1145_read_from_register(dev, SI1145_REG_UVINDEX0);
+    uint8_t high = si1145_read_from_register(dev, SI1145_REG_UVINDEX1);
+    uint16_t rslt = ((uint16_t)high << 8) | low;
+    dev->IR = rslt;
+    
+    return rslt;
 }
