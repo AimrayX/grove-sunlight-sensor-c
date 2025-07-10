@@ -11,7 +11,7 @@ A lightweight and portable **C driver** for the **Grove Sunlight Sensor** (based
 
 ## Supported Hardware
 
-- Grove Sunlight Sensor (SI1145 might also work for SI1146 and SI1146 but not tested)
+- Grove Sunlight Sensor (SI1145 might also work for SI1146 and SI1147 but not tested)
 - Raspberry Pi
 
 ### Clone the Repo
