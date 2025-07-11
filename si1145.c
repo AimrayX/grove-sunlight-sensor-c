@@ -1,21 +1,29 @@
 #include "si1145.h"
 #include <stdio.h>
+#include <unistd.h>
 #include <time.h>
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
-bool si1145_begin(si1145_t *dev) {
+int si1145_begin(si1145_t *dev) {
     dev->i2c_fd = wiringPiI2CSetup(SI1145_ADDR);
     dev->part_ID = si1145_read_from_register(dev, SI1145_REG_PART_ID);
-    si1145_write_to_register(dev, SI1145_REG_HW_KEY, 0x17);
+    si1145_reset(dev);
     si1145_default_init(dev);
 }
 
 
 
 void si1145_reset(si1145_t *dev) {
-
-
+    si1145_write_to_register(dev, SI1145_REG_MEAS_RATE0, 0);
+    si1145_write_to_register(dev, SI1145_REG_MEAS_RATE1, 0);
+    si1145_write_to_register(dev, SI1145_REG_IRQ_ENABLE, 0);
+    si1145_write_to_register(dev, SI1145_REG_INT_CFG, 0);
+    si1145_write_to_register(dev, SI1145_REG_IRQ_STATUS, 0);
+    si1145_exec_command(dev, SI1145_CMD_RESET);
+    sleep(10);
+    si1145_write_to_register(dev, SI1145_REG_HW_KEY, 0x17);
+    delay(10);
 }
 
 
@@ -25,10 +33,11 @@ void si1145_default_init(si1145_t *dev) {
     si1145_write_to_register(dev, SI1145_REG_UCOEF1, 0x89);
     si1145_write_to_register(dev, SI1145_REG_UCOEF2, 0x02);
     si1145_write_to_register(dev, SI1145_REG_UCOEF3, 0x00);
-    si1145_write_param_data(dev, SI1145_PARAM_CHLIST, SI1145_PARAM_CHLIST_ENUV 
-                               | SI1145_PARAM_CHLIST_ENALSIR 
-                               | SI1145_PARAM_CHLIST_ENALSVIS
-                               | SI1145_PARAM_CHLIST_ENPS1);
+    si1145_write_param_data(dev, SI1145_PARAM_CHLIST, 
+                                 SI1145_PARAM_CHLIST_EN_UV 
+                               | SI1145_PARAM_CHLIST_EN_ALS_IR 
+                               | SI1145_PARAM_CHLIST_EN_ALS_VIS
+                               | SI1145_PARAM_CHLIST_EN_PS1);
     
     //set LED1 current
     //not sure if really needed
@@ -75,6 +84,13 @@ int si1145_write_to_register(si1145_t *dev, uint8_t reg, uint8_t value) {
         fprintf(stderr, "Error: Failed to write to register");
         return -1;
     }
+
+    if (si1145_read_from_register(dev, reg) != value)
+    {
+        fprintf(stderr, "Error: Failed to write to register");
+        return -1;
+    }
+    
     return 0;
 }
 
@@ -84,7 +100,7 @@ int si1145_exec_command(si1145_t *dev, uint8_t value) {
     int i = 0;
     int j = 0;
     struct timespec ts1 = {0, 25000000}; // 0 seconds, 25'000'000 nanoseconds (25ms)
-    struct timespec ts2 = {0, 1000000};  // 0 seconds, 1'000'000 nanoseconds (1ms)
+    struct timespec ts2 = {0, 1000000};  // 0 seconds,  1'000'000 nanoseconds (1ms)
     while (j < 2)
     {
         
@@ -153,8 +169,7 @@ int si1145_exec_command(si1145_t *dev, uint8_t value) {
 
 
 int si1145_ps_als_force(si1145_t *dev) {
-
-
+    return si1145_exec_command(dev, SI1145_CMD_PSALS_FORCE);
 }
 
 
