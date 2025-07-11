@@ -184,6 +184,6 @@
 #define SI1145_SET_IRQ_ENABLE_PS3               0x10
 
 
-#define SI1145_ADDR 0x60
+#define SI1145_ADDR 0x53
 
 #endif

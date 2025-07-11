@@ -72,7 +72,7 @@ void si1145_default_init(si1145_t *dev) {
 
 
 uint8_t si1145_read_from_register(si1145_t *dev, uint8_t reg) {
-
+    int tc = wiringPiI2CReadReg8(dev->i2c_fd, reg);
     return wiringPiI2CReadReg8(dev->i2c_fd, reg);
 }
 
@@ -81,13 +81,13 @@ uint8_t si1145_read_from_register(si1145_t *dev, uint8_t reg) {
 int si1145_write_to_register(si1145_t *dev, uint8_t reg, uint8_t value) {
     
     if(wiringPiI2CWriteReg8(dev->i2c_fd, reg, value) != 0) {
-        fprintf(stderr, "Error: Failed to write to register");
+        fprintf(stderr, "[ERROR] %s:%d: Failed to write to register\n", __FILE__, __LINE__);
         return -1;
     }
 
     if (si1145_read_from_register(dev, reg) != value)
     {
-        fprintf(stderr, "Error: Failed to write to register");
+        fprintf(stderr, "[ERROR] %s:%d: Failed to write to register\n", __FILE__, __LINE__);
         return -1;
     }
     
@@ -103,22 +103,24 @@ int si1145_exec_command(si1145_t *dev, uint8_t value) {
     struct timespec ts2 = {0, 1000000};  // 0 seconds,  1'000'000 nanoseconds (1ms)
     while (j < 2)
     {
-        
+        i=0;
         while (i < 2)
         {
             //1. Write 0x00 to Command register to clear the Response register
-            wiringPiI2CWriteReg8(dev->i2c_fd, SI1145_REG_COMMAND, SI1145_CMD_NOP);
+            int rv = wiringPiI2CWriteReg8(dev->i2c_fd, SI1145_REG_COMMAND, SI1145_CMD_NOP);
 
             //2. Read Response register and verify contents are 0x00
             if(si1145_read_from_register(dev, SI1145_REG_RESPONSE) != 0x00) {
-                fprintf(stderr, "Warning: Response register not 0x00 after 1. write to command register\n");
+                fprintf(stderr, "[WARNING] %s:%d: Response register not 0x00 after 1. write to command register\n", __FILE__, __LINE__);
                 i++;
+            } else {
+                break;
             }
         }
 
         if (i > 1)
         {
-            fprintf(stderr, "Error: Failed to write to command register\n");
+            fprintf(stderr, "[ERROR] %s:%d: Failed to write to command register\n", __FILE__, __LINE__);
             return -1;
         }
 
@@ -126,7 +128,7 @@ int si1145_exec_command(si1145_t *dev, uint8_t value) {
         while (i < 2)
         {
             //3. Write Command value from Table 5 into Command register
-            wiringPiI2CWriteReg8(dev->i2c_fd, SI1145_REG_COMMAND, value);
+            int rc = wiringPiI2CWriteReg8(dev->i2c_fd, SI1145_REG_COMMAND, value);
 
             //Step 4 is not applicable to the Reset Command because the device
             //will reset itself and does not increment the
@@ -145,18 +147,21 @@ int si1145_exec_command(si1145_t *dev, uint8_t value) {
             //the entire Command process should be repeated starting with Step 1.
             nanosleep(&ts1, NULL);
             if(si1145_read_from_register(dev, SI1145_REG_RESPONSE) == 0x00) {
-                fprintf(stderr, "Warning: Failed to write command to command register\n");
+                fprintf(stderr, "[WARNING] %s:%d: Failed to write command to command register\n", __FILE__, __LINE__);
+                i++;
+            } else {
+                break;
             }
         }
         
         if (i > 1)
         {
-            fprintf(stderr, "Error: Failed to write to command register\n");
+            fprintf(stderr, "[ERROR] %s:%d: Failed to write to command register\n", __FILE__, __LINE__);
             if (j > 1)
             {
                 return -1;
             }
-            fprintf(stderr, "Warning: Repeating command process\n");
+            fprintf(stderr, "[WARNING] %s:%d: Repeating command process\n", __FILE__, __LINE__);
             j++;
         } else {
             break;
