@@ -1,4 +1,4 @@
-#I give up. I hate seed studio. Why do they change the sensor but still sell it under the same name?????!!!! Im leaving this here in case someone can do something with this. :(
+# I give up. I hate seed studio. Why do they change the sensor but still sell it under the same name?????!!!! Im leaving this here in case someone can do something with this. :(
 
 # Grove Sunlight Sensor C Library
 
