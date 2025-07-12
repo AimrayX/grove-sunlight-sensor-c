@@ -1,4 +1,4 @@
-#include "si1145.h"
+#include "si1151.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>

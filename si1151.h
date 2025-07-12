@@ -1,7 +1,7 @@
 #ifndef _SI1145_H_
 #define _SI1145_H_
 
-#include "si1145_defs.h"
+#include "si1151_defs.h"
 #include <stdint.h>
 #include <stdbool.h>
 
