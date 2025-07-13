@@ -11,7 +11,10 @@ int si1151_begin(si1151_t *dev, bool mode) {
     dev->part_ID = si1151_read_from_register(dev, SI1151_REG_PART_ID);
     si1151_reset(dev);
     si1151_default_init(dev);
+    fprintf(stderr, "[INFO] %s:%d: Sensor has been set to default settings\n", __FILE__, __LINE__);
     si1151_exec_command(dev, SI1151_CMD_START);
+    fprintf(stderr, "[INFO] %s:%d: Starting measurements\n", __FILE__, __LINE__);
+    return 0;
 }
 
 void si1151_reset(si1151_t *dev) {
@@ -73,12 +76,12 @@ int si1151_write_to_register(si1151_t *dev, uint8_t reg, uint8_t value) {
         return -1;
     }
     sleep(1);
-    if (si1151_read_from_register(dev, reg) != value)
+    uint8_t rs = si1151_read_from_register(dev, reg);
+    if (reg != SI1151_REG_COMMAND && si1151_read_from_register(dev, reg) != value)
     {
         fprintf(stderr, "[ERROR] %s:%d: Wrote to register, but check returned wrong value\n", __FILE__, __LINE__);
         return -1;
     }
-    
     return 0;
 }
 
@@ -120,7 +123,7 @@ int si1151_exec_command(si1151_t *dev, uint8_t value) {
     //wait until reset command has finished executing
     if (value == SI1151_CMD_RESET_SW)
     {
-        while (si1151_read_from_register(dev, SI1151_REG_RESPONSE0) != 0x0F)
+        while (((si1151_read_from_register(dev, SI1151_REG_RESPONSE0) | 0b11110000) ^ 0b11110000) != 0x0F)
         {
             fprintf(stderr, "[WARNING] %s:%d: Reset hasn't finished, waiting...\n", __FILE__, __LINE__);
             sleep(5);
