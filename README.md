@@ -4,7 +4,7 @@ A lightweight **C driver** for the **Grove Sunlight Sensor** (based on **SI1151*
 
 ## Features
 
-- Read UV, visible, and IR light data
+- Read visible and IR light data
 - I2C-based communication
 - Compatible with Grove Sunlight Sensor
 - Easy integration into embedded C projects
