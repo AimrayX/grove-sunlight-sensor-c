@@ -1,6 +1,6 @@
 # Grove Sunlight Sensor C Library
 
-A lightweight **C driver** for the **Grove Sunlight Sensor** (based on **SI1151**) using **I2C** communication. Designed for the Raspberry Pi.
+A lightweight **C driver** for the **Grove Sunlight Sensor** (based on **SI1151**) using **I2C** communication. Designed for the Raspberry Pi. Tested on Raspberry Pi 4.
 
 ## Features
 
