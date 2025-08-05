@@ -29,7 +29,7 @@ typedef struct {
  * @param mode 1 for autonomous, 0 for forced
  * @return Returns 0 if normal -1 for error
  */
-int si1151_begin(si1151_t *dev, bool mode);
+int si1151_begin(si1151_t *dev, bool mode, int fd);
 
 /**
  * @brief Resets sensor
@@ -59,7 +59,7 @@ void si1151_default_init(si1151_t *dev);
  * @param reg Register to read from
  * @return Returns read 8-Bit value
  */
-uint8_t si1151_read_from_register(si1151_t *dev, uint8_t reg);
+int si1151_read_from_register(si1151_t *dev, uint8_t reg, uint8_t *data);
 
 /**
  * @brief Write to a register
