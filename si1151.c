@@ -8,6 +8,7 @@
 
 int si1151_begin(si1151_t *dev, bool mode, int fd) {
     dev->is_autonomous = mode;
+    dev->i2c_addr = SI1151_ADDR;
     dev->i2c_fd = fd;
 
     uint8_t data = 0;
@@ -79,7 +80,7 @@ int si1151_read_from_register(si1151_t *dev, uint8_t reg, uint8_t *data) {
     messages[1].len   = 1;
     messages[1].buf   = data;
 
-    packets.msgs  = &messages;
+    packets.msgs  = messages;
     packets.nmsgs = 2;
 
     if (ioctl(dev->i2c_fd, I2C_RDWR, &packets) < 0) {
@@ -113,7 +114,7 @@ int si1151_write_to_register(si1151_t *dev, uint8_t reg, uint8_t value) {
     messages[0].len   = 2;
     messages[0].buf   = buffer;
 
-    packets.msgs  = &messages;
+    packets.msgs  = messages;
     packets.nmsgs = 1;
 
     if (ioctl(dev->i2c_fd, I2C_RDWR, &packets) < 0) {
@@ -203,7 +204,7 @@ uint8_t si1151_write_param_data(si1151_t *dev, uint8_t param, uint8_t value) {
 }
 
 uint16_t si1151_read_visible(si1151_t *dev) {
-    if(!dev->is_autonomous) si1151_exec_command(dev, si1151_force_measurement);
+    if(!dev->is_autonomous) si1151_force_measurement(dev);
     uint8_t data = 0;
     si1151_read_from_register(dev, SI1151_REG_HOST_OUT0, &data);
     uint8_t low = data; 
@@ -216,7 +217,7 @@ uint16_t si1151_read_visible(si1151_t *dev) {
 }
 
 uint16_t si1151_read_IR(si1151_t *dev) {
-    if(!dev->is_autonomous) si1151_exec_command(dev, si1151_force_measurement);
+    if(!dev->is_autonomous) si1151_force_measurement(dev);
     uint8_t data = 0;
     si1151_read_from_register(dev, SI1151_REG_HOST_OUT2, &data);
     uint8_t low = data; 

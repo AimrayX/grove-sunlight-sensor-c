@@ -56,5 +56,3 @@ dkms.conf
 
 *.pdf
 .vscode/
-main.c
-Makefile
